@@ -23,6 +23,8 @@
             android:screenOrientation="portrait"/>
         <activity android:name=".HomeActivity"
             android:screenOrientation="portrait"/>
+        <activity android:name=".AddExpenseActivity"
+            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>

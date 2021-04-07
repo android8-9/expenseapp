@@ -67,6 +67,7 @@ public class LoginActivity extends AppCompatActivity {
                             User user = response.body();
                             SharedPreferences.Editor editor = sp.edit();
                             editor.putString("mobile",user.getMobile());
+                            editor.putInt("id",user.getId());
                             editor.commit();
                             sendUserToHomeActivity();
                         }
