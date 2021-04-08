@@ -1,6 +1,7 @@
 package com.cheekupeeku.expensetrackerapp;
 
 import android.app.DatePickerDialog;
+import android.app.ProgressDialog;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -10,10 +11,12 @@ import android.widget.DatePicker;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.cheekupeeku.expensetrackerapp.databinding.AddExpenseBinding;
 import com.cheekupeeku.expensetrackerapp.model.Category;
+import com.cheekupeeku.expensetrackerapp.model.Expense;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -36,7 +39,9 @@ public class AddExpenseActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = AddExpenseBinding.inflate(LayoutInflater.from(this));
         setContentView(binding.getRoot());
-
+         setSupportActionBar(binding.addExpenseToolBar);
+         ActionBar ab = getSupportActionBar();
+         ab.setDisplayHomeAsUpEnabled(true);
         sp = getSharedPreferences("user",MODE_PRIVATE);
         currentUserId = sp.getInt("id",0);
         CategoryApiInterface apiInterface = CategoryApi.getCategoryApiInstance();
@@ -79,7 +84,27 @@ public class AddExpenseActivity extends AppCompatActivity {
                 String paymentMode = "";
                 if(binding.rdCash.isChecked()) paymentMode = "Cash";
                 else if(binding.rdOnline.isChecked()) paymentMode = "Online";
+                ProgressDialog pd = new ProgressDialog(AddExpenseActivity.this);
+                pd.setMessage("please wait while saving data...");
+                pd.show();
+                ExpenseApi.ExpenseApiInterface apiInterface1 = ExpenseApi.getApiInstance();
+                Call<Expense> call = apiInterface1.saveExpense(""+category.getId(),currentUserId+"",amount,edate,paymentMode,tag);
+                call.enqueue(new Callback<Expense>() {
+                    @Override
+                    public void onResponse(Call<Expense> call, Response<Expense> response) {
+                        pd.dismiss();
+                        if(response.code() == 200){
+                            Toast.makeText(AddExpenseActivity.this, "Expense saved", Toast.LENGTH_SHORT).show();
+                            finish();
+                        }
+                    }
 
+                    @Override
+                    public void onFailure(Call<Expense> call, Throwable t) {
+                        pd.dismiss();
+                        Toast.makeText(AddExpenseActivity.this, ""+t, Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         });
     }

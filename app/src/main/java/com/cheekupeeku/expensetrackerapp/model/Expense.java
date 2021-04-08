@@ -26,6 +26,18 @@ public class Expense {
     @Expose
     private String paymentMode;
 
+    @SerializedName("categoryName")
+    @Expose
+    private String categoryName;
+
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
+    }
+
     public int getId() {
         return id;
     }
